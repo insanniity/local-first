@@ -1,22 +1,29 @@
 import Button from '@/components/button';
+import { accountsCollection } from '@/db';
+import Account from '@/model/Account';
+import { withObservables } from '@nozbe/watermelondb/react';
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-const MOCK_ACCOUNTS = [
-    { name: 'Account 1', cap: '1000', tap: '2000', id: '1' },
-    { name: 'Account 2', cap: '1500', tap: '2500', id: '2' },
-    { name: 'Account 3', cap: '2000', tap: '3000', id: '3' },
-];
-
-export default function AccountsScreen() {
+function AccountsScreen({ accounts }: { accounts: Account[] }) {
     const router = useRouter();
+    // const [accounts, setAccounts] = useState<Account[]>([]);
+
+    // const getData = useCallback(() => {
+    //     (async () => {
+    //         const fetchedAccounts = await accountsCollection.query().fetch();
+    //         setAccounts(fetchedAccounts);
+    //     })();
+    // }, []);
+
+    // useFocusEffect(getData);
 
     return (
         <View
             style={styles.container}
         >
             <FlatList
-                data={MOCK_ACCOUNTS}
+                data={accounts}
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={() => (
                     <View style={styles.card}>
@@ -41,18 +48,17 @@ export default function AccountsScreen() {
 }
 
 
-function AccountCard({ account }: { account: { name: string; cap: string; tap: string } }) {
+function AccountCard({ account }: { account: Account }) {
     return (
         <View style={styles.card}>
             <View style={styles.cardContent}>
                 <Text>{account.name}</Text>
-                <Text>{account.cap}</Text>
-                <Text>{account.tap}</Text>
+                <Text>{account.cap} %</Text>
+                <Text>{account.tap} %</Text>
             </View>
         </View>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -79,3 +85,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
 });
+
+const enhance = withObservables(['account'], () => ({
+    accounts: accountsCollection.query()
+}))
+
+const EnhancedAccountsScreen = enhance(AccountsScreen);
+
+export default EnhancedAccountsScreen;

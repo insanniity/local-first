@@ -16,7 +16,8 @@
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.insannity.localfirst"
     },
     "web": {
       "bundler": "metro",
@@ -41,7 +42,10 @@
             "extraPods": [
               {
                 "name": "simdjson",
-                "configurations": ["Debug", "Release"],
+                "configurations": [
+                  "Debug",
+                  "Release"
+                ],
                 "path": "../node_modules/@nozbe/simdjson",
                 "modular_headers": true
               }
