@@ -17,6 +17,16 @@ export default function AccountsScreen() {
         >
             <FlatList
                 data={MOCK_ACCOUNTS}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={() => (
+                    <View style={styles.card}>
+                        <View style={styles.cardContent}>
+                            <Text>Name</Text>
+                            <Text>CAP</Text>
+                            <Text>TAP</Text>
+                        </View>
+                    </View>
+                )}
                 renderItem={({ item }) => (
                     <AccountCard account={item} />
                 )}
