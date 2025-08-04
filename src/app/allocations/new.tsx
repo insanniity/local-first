@@ -3,7 +3,7 @@ import database, { allocationsCollection } from "@/db";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput } from "react-native";
 import { InferType, number, object } from "yup";
 
 const formSchema = object({
@@ -41,37 +41,39 @@ export default function NewAllocationScreen() {
     };
 
     return (
-        <View
-            style={styles.container}
-        >
-
-            <Text
-                style={styles.label}
+        <KeyboardAvoidingView style={styles.container}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
             >
-                Income:
-            </Text>
-            <Controller
-                control={control}
-                name="income"
-                render={({ field: { onChange, value } }) => (
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Income"
-                        value={value?.toString()}
-                        onChangeText={onChange}
-                        keyboardType="numeric"
-                    />
-                )}
-            />
-            {errors.income && <Text style={styles.error}>{errors.income.message}</Text>}
-            <Button onPress={handleSubmit(onSubmit)} label="Save" />
-        </View>
+                <Text
+                    style={styles.label}
+                >
+                    Income:
+                </Text>
+                <Controller
+                    control={control}
+                    name="income"
+                    render={({ field: { onChange, value } }) => (
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Income"
+                            value={value?.toString()}
+                            onChangeText={onChange}
+                            keyboardType="numeric"
+                        />
+                    )}
+                />
+                {errors.income && <Text style={styles.error}>{errors.income.message}</Text>}
+
+                <Button onPress={handleSubmit(onSubmit)} label="Save" />
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
+        flex: 1,
         padding: 20,
         backgroundColor: '#f5f5f5',
     },
