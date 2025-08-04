@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { LayoutDashboardIcon, WalletIcon } from "lucide-react-native";
+import { FolderTreeIcon, LayoutDashboardIcon, WalletIcon } from "lucide-react-native";
 
 export default function RootLayout() {
   return (
@@ -8,14 +8,24 @@ export default function RootLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ size, color }) => <LayoutDashboardIcon size={size} color={color} />
+          tabBarIcon: ({ size, color }) => <LayoutDashboardIcon size={size} color={color} />,
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="allocations"
+        options={{
+          title: "Allocations",
+          tabBarIcon: ({ size, color }) => <FolderTreeIcon size={size} color={color} />,
+          headerShown: false
         }}
       />
       <Tabs.Screen
         name="accounts"
         options={{
           title: "Accounts",
-          tabBarIcon: ({ size, color }) => <WalletIcon size={size} color={color} />
+          tabBarIcon: ({ size, color }) => <WalletIcon size={size} color={color} />,
+          headerShown: false
         }}
       />
     </Tabs>
