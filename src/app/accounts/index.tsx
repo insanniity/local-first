@@ -1,9 +1,10 @@
 import Button from '@/components/button';
-import { accountsCollection } from '@/db';
+import database, { accountsCollection } from '@/db';
 import Account from '@/model/Account';
 import { withObservables } from '@nozbe/watermelondb/react';
 import { useRouter } from 'expo-router';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { TrashIcon } from 'lucide-react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 function AccountsScreen({ accounts }: { accounts: Account[] }) {
     const router = useRouter();
@@ -31,6 +32,7 @@ function AccountsScreen({ accounts }: { accounts: Account[] }) {
                             <Text>Name</Text>
                             <Text>CAP</Text>
                             <Text>TAP</Text>
+                            <Text>Ação</Text>
                         </View>
                     </View>
                 )}
@@ -49,12 +51,22 @@ function AccountsScreen({ accounts }: { accounts: Account[] }) {
 
 
 function AccountCard({ account }: { account: Account }) {
+
+    async function handleDelete() {
+        await database.write(async () => {
+            await account.markAsDeleted();
+        });
+    }
+
     return (
         <View style={styles.card}>
             <View style={styles.cardContent}>
                 <Text>{account.name}</Text>
                 <Text>{account.cap} %</Text>
                 <Text>{account.tap} %</Text>
+                <Pressable style={styles.deleteButton} onPress={handleDelete}>
+                    <TrashIcon size={20} color="white" />
+                </Pressable>
             </View>
         </View>
     );
@@ -83,6 +95,11 @@ const styles = StyleSheet.create({
     cardContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+    deleteButton: {
+        padding: 5,
+        backgroundColor: 'red',
+        borderRadius: 5,
     },
 });
 

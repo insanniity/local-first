@@ -25,9 +25,10 @@ type FormType = InferType<typeof formSchema>;
 
 export default function NewAccountScreen() {
     const router = useRouter();
-    const { control, handleSubmit, formState: { errors } } = useForm({
+    const { control, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(formSchema),
         mode: "onSubmit",
+        defaultValues: formSchema.getDefault(),
     });
 
     const onSubmit = async (data: FormType) => {
@@ -42,6 +43,7 @@ export default function NewAccountScreen() {
             });
             console.log("Account created successfully");
             router.replace("/accounts");
+            reset(formSchema.getDefault());
         } catch (error) {
             console.error("Error creating account:", error);
         }
