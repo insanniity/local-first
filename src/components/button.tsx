@@ -1,6 +1,6 @@
+import { theme } from '@/styles/theme';
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextStyle, ViewStyle } from "react-native";
-import { theme } from '../styles/theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'small' | 'medium' | 'large';

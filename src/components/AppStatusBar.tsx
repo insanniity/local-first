@@ -1,5 +1,5 @@
+import { theme } from '@/styles/theme';
 import { StatusBar } from 'expo-status-bar';
-import { theme } from '../styles/theme';
 
 export function AppStatusBar() {
     return (

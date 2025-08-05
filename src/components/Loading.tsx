@@ -1,6 +1,6 @@
+import { theme } from '@/styles/theme';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { theme } from '../styles/theme';
 
 type LoadingProps = {
     text?: string;
