@@ -48,7 +48,7 @@ function AllocationsScreen({ allocations }: { allocations: Allocation[] }) {
                     <FlatList
                         data={allocations}
                         showsVerticalScrollIndicator={false}
-                        renderItem={({ item }) => <EnhancedAllocationCard allocation={item} accountAllocations={item.accountAllocations} />}
+                        renderItem={({ item }) => <EnhancedAllocationCard allocation={item} />}
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={styles.list}
                         ListHeaderComponent={
@@ -91,8 +91,8 @@ function AllocationCard({ allocation, accountAllocations }: { allocation: Alloca
     }
 
     return (
-        <Card>
-            <View style={styles.cardRow}>
+        <Card style={styles.allocationCard}>
+            <View style={styles.cardHeader}>
                 <Text style={styles.dateText}>
                     {moment(allocation.createdAt).format('DD/MM/YYYY')}
                 </Text>
@@ -111,9 +111,31 @@ function AllocationCard({ allocation, accountAllocations }: { allocation: Alloca
                     <TrashIcon size={18} color={theme.colors.text.inverse} />
                 </Pressable>
             </View>
+
+            {accountAllocations.length > 0 && (
+                <View style={styles.allocationDetails}>
+                    <Text style={styles.allocationsTitle}>Alocações:</Text>
+                    <View style={styles.accountAllocations}>
+                        {accountAllocations.map((accountAllocation) => (
+                            <View key={accountAllocation.id} style={styles.allocationItem}>
+                                <Text style={styles.accountName}>
+                                    {accountAllocation.account.name}
+                                </Text>
+                                <Text style={styles.accountAmount}>
+                                    R$ {accountAllocation.amount?.toLocaleString('pt-BR', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            )}
         </Card>
     );
 }
+
 
 const styles = StyleSheet.create({
     content: {
@@ -210,12 +232,64 @@ const styles = StyleSheet.create({
     emptyButton: {
         maxWidth: 200,
     },
+
+    allocationCard: {
+        marginBottom: theme.spacing.sm,
+    },
+
+    cardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: theme.spacing.sm,
+    },
+
+    allocationDetails: {
+        borderTopWidth: 1,
+        borderTopColor: theme.colors.border.light,
+        paddingTop: theme.spacing.sm,
+    },
+
+    allocationsTitle: {
+        ...theme.typography.bodySmall,
+        fontWeight: '600',
+        color: theme.colors.text.secondary,
+        marginBottom: theme.spacing.xs,
+    },
+
+    allocationItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: theme.spacing.xs,
+    },
+
+    accountName: {
+        ...theme.typography.bodySmall,
+        color: theme.colors.text.primary,
+        flex: 1,
+    },
+
+    accountAmount: {
+        ...theme.typography.bodySmall,
+        color: theme.colors.status.success,
+        fontWeight: '600',
+    },
+
+    accountAllocations: {
+        gap: theme.spacing.xs,
+    },
+
+    accountAllocation: {
+        ...theme.typography.bodySmall,
+        color: theme.colors.text.primary,
+    },
 });
 
 
 const enhanceCard = withObservables(['allocation'], ({ allocation }: { allocation: Allocation }) => ({
     allocation,
-    accountAllocations: allocation.accountAllocations,
+    accountAllocations: allocation.accountAllocations
 }));
 
 const EnhancedAllocationCard = enhanceCard(AllocationCard);
