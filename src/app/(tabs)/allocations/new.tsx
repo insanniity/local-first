@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Input from "@/components/Input";
 import database, { accountAllocationCollection, accountsCollection, allocationsCollection } from "@/db";
 import Account from "@/model/Account";
+import { useAuth } from "@/providers/AuthProvider";
 import { globalStyles } from "@/styles/globalStyles";
 import { theme } from "@/styles/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -31,6 +32,7 @@ function NewAllocationScreen({ accounts }: { accounts: Account[] }) {
         defaultValues: formSchema.getDefault(),
     });
     const income = watch("income");
+    const { user } = useAuth();
 
     const onSubmit = async (data: FormType) => {
         try {
@@ -43,7 +45,8 @@ function NewAllocationScreen({ accounts }: { accounts: Account[] }) {
                     item.account.set(account);
                     item.allocation.set(allocation);
                     item.cap = account.cap;
-                    item.amount = (data.income * (account.cap || 0)) / 100;
+                    item.amount = (allocation.income! * (account.cap || 0)) / 100;
+                    item.userId = user!.id;
                 })));
 
                 const account = accounts[0];
@@ -52,7 +55,8 @@ function NewAllocationScreen({ accounts }: { accounts: Account[] }) {
                     item.account.set(account);
                     item.allocation.set(allocation);
                     item.cap = account.cap;
-                    item.amount = (data.income * (account.cap || 0));
+                    item.amount = (allocation.income! * (account.cap || 0));
+                    item.userId = user!.id;
                 });
 
             });

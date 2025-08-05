@@ -3,6 +3,7 @@ import Card from "@/components/Card";
 import Header from "@/components/Header";
 import Input from "@/components/Input";
 import database, { accountsCollection } from "@/db";
+import { useAuth } from "@/providers/AuthProvider";
 import { globalStyles } from "@/styles/globalStyles";
 import { theme } from "@/styles/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -40,6 +41,7 @@ export default function NewAccountScreen() {
         mode: "onSubmit",
         defaultValues: formSchema.getDefault(),
     });
+    const { user } = useAuth();
 
     const capValue = watch("cap");
     const tapValue = watch("tap");
@@ -51,6 +53,7 @@ export default function NewAccountScreen() {
                     account.name = data.name;
                     account.cap = data.cap;
                     account.tap = data.tap;
+                    account.userId = user!.id;
                 });
             });
             router.replace("/accounts");
