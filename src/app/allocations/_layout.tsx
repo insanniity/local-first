@@ -1,27 +1,35 @@
 import { Stack } from "expo-router";
+import { theme } from "../../styles/theme";
 
 export default function RootLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.colors.surface,
+        },
+        headerTitleStyle: {
+          ...theme.typography.h3,
+          color: theme.colors.text.primary,
+        },
+        headerTintColor: theme.colors.primary,
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name="index"
-        options={{ title: "Allocations" }}
+        options={{
+          headerShown: false
+        }}
       />
       <Stack.Screen
         name="new"
         options={{
-          title: "New Allocation",
+          headerShown: false,
           presentation: "modal",
-          // sheetAllowedDetents: 'fitToContents',
-          // headerTitle: "New Allocation",
-          // sheetCornerRadius: 100,
-          // keyboardHandlingEnabled: true,
-          // sheetLargestUndimmedDetentIndex: "last", // Adjust as needed
-          // sheetGrabberVisible: true, // Show grabber for better UX
         }}
       />
     </Stack>
   )
-
 }
 

@@ -1,38 +1,50 @@
 import Button from "@/components/button";
+import Card from "@/components/Card";
+import Header from "@/components/Header";
+import Input from "@/components/Input";
 import database, { accountsCollection } from "@/db";
+import { globalStyles } from "@/styles/globalStyles";
+import { theme } from "@/styles/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
+import { ArrowLeftIcon, PercentIcon, UserIcon } from "lucide-react-native";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput } from "react-native";
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { InferType, number, object, string } from "yup";
 
 const formSchema = object({
     name: string()
-        .min(2, "Name must be at least 2 characters")
+        .min(2, "Nome deve ter pelo menos 2 caracteres")
         .default("")
-        .required("Name is required"),
+        .required("Nome é obrigatório"),
     cap: number()
         .optional()
         .default(0)
-        .transform(value => (value ? Number(value) : undefined)),
+        .transform(value => (value ? Number(value) : undefined))
+        .min(0, "CAP deve ser maior ou igual a 0")
+        .max(100, "CAP deve ser menor ou igual a 100"),
     tap: number()
         .optional()
         .default(0)
-        .transform(value => (value ? Number(value) : undefined)),
+        .transform(value => (value ? Number(value) : undefined))
+        .min(0, "TAP deve ser maior ou igual a 0")
+        .max(100, "TAP deve ser menor ou igual a 100"),
 })
 
 type FormType = InferType<typeof formSchema>;
 
 export default function NewAccountScreen() {
     const router = useRouter();
-    const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    const { control, handleSubmit, formState: { errors, isSubmitting }, reset, watch } = useForm({
         resolver: yupResolver(formSchema),
         mode: "onSubmit",
         defaultValues: formSchema.getDefault(),
     });
 
+    const capValue = watch("cap");
+    const tapValue = watch("tap");
+
     const onSubmit = async (data: FormType) => {
-        console.log("Form submitted with data:", data);
         try {
             await database.write(async () => {
                 await accountsCollection.create((account) => {
@@ -41,7 +53,6 @@ export default function NewAccountScreen() {
                     account.tap = data.tap;
                 });
             });
-            console.log("Account created successfully");
             router.replace("/accounts");
             reset(formSchema.getDefault());
         } catch (error) {
@@ -50,98 +61,176 @@ export default function NewAccountScreen() {
     };
 
     return (
-        <KeyboardAvoidingView style={styles.container}>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-            >
-                <Text
-                    style={styles.label}
-                >
-                    Name:
-                </Text>
-                <Controller
-                    control={control}
-                    name="name"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Name"
-                            value={value}
-                            onChangeText={onChange}
+        <View style={globalStyles.container}>
+            <Header
+                title="Nova Conta"
+                subtitle="Configure uma nova conta de investimento"
+                leftAction={
+                    <Pressable
+                        style={styles.backButton}
+                        onPress={() => router.back()}
+                    >
+                        <ArrowLeftIcon size={20} color={theme.colors.text.primary} />
+                    </Pressable>
+                }
+            />
+
+            <KeyboardAvoidingView style={styles.content}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={styles.form}>
+                        <Card variant="elevated">
+                            <Text style={styles.sectionTitle}>Informações da Conta</Text>
+
+                            <Controller
+                                control={control}
+                                name="name"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="Nome da Conta"
+                                        placeholder="Ex: Conta Corrente, Poupança..."
+                                        value={value}
+                                        onChangeText={onChange}
+                                        error={errors.name?.message}
+                                        leftIcon={<UserIcon size={20} color={theme.colors.text.secondary} />}
+                                    />
+                                )}
+                            />
+                        </Card>
+
+                        <Card variant="elevated">
+                            <Text style={styles.sectionTitle}>Configuração de Percentuais</Text>
+                            <Text style={styles.sectionSubtitle}>
+                                Configure as porcentagens de alocação para esta conta
+                            </Text>
+
+                            <Controller
+                                control={control}
+                                name="cap"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="CAP (Capital Allocation Percentage)"
+                                        placeholder="0"
+                                        value={value?.toString()}
+                                        onChangeText={onChange}
+                                        keyboardType="numeric"
+                                        error={errors.cap?.message}
+                                        helperText="Porcentagem da renda alocada para esta conta"
+                                        leftIcon={<PercentIcon size={20} color={theme.colors.text.secondary} />}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                control={control}
+                                name="tap"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="TAP (Target Allocation Percentage)"
+                                        placeholder="0"
+                                        value={value?.toString()}
+                                        onChangeText={onChange}
+                                        keyboardType="numeric"
+                                        error={errors.tap?.message}
+                                        helperText="Meta de porcentagem para rebalanceamento"
+                                        leftIcon={<PercentIcon size={20} color={theme.colors.text.secondary} />}
+                                    />
+                                )}
+                            />
+                        </Card>
+
+                        {(capValue || tapValue) && (
+                            <Card variant="outlined" style={styles.previewCard}>
+                                <Text style={styles.previewTitle}>Prévia da Configuração</Text>
+
+                                <View style={styles.previewRow}>
+                                    <Text style={styles.previewLabel}>CAP:</Text>
+                                    <Text style={styles.previewValue}>{capValue || 0}%</Text>
+                                </View>
+
+                                <View style={styles.previewRow}>
+                                    <Text style={styles.previewLabel}>TAP:</Text>
+                                    <Text style={styles.previewValue}>{tapValue || 0}%</Text>
+                                </View>
+
+                                <Text style={styles.previewExample}>
+                                    Com uma renda de R$ 1.000,00, esta conta receberá R$ {((capValue || 0) * 10).toFixed(2)}
+                                </Text>
+                            </Card>
+                        )}
+
+                        <Button
+                            onPress={handleSubmit(onSubmit)}
+                            label="Salvar Conta"
+                            loading={isSubmitting}
                         />
-                    )}
-                />
-                {errors.name && <Text style={styles.error}>{errors.name.message}</Text>}
-                <Text
-                    style={styles.label}
-                >
-                    CAP:
-                </Text>
-                <Controller
-                    control={control}
-                    name="cap"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            placeholder="CAP"
-                            value={value?.toString()}
-                            onChangeText={onChange}
-                            keyboardType="numeric"
-                        />
-                    )}
-                />
-                {errors.cap && <Text style={styles.error}>{errors.cap.message}</Text>}
-                <Text
-                    style={styles.label}
-                >
-                    TAP:
-                </Text>
-                <Controller
-                    control={control}
-                    name="tap"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            placeholder="TAP"
-                            value={value?.toString()}
-                            onChangeText={onChange}
-                            keyboardType="numeric"
-                        />
-                    )}
-                />
-                {errors.tap && <Text style={styles.error}>{errors.tap.message}</Text>}
-                <Button onPress={handleSubmit(onSubmit)} label="Save" />
-            </ScrollView>
-        </KeyboardAvoidingView>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     );
 }
 
-
 const styles = StyleSheet.create({
-    container: {
+    content: {
         flex: 1,
-        padding: 20,
+        backgroundColor: theme.colors.background,
     },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 20,
+
+    form: {
+        padding: theme.spacing.md,
     },
-    label: {
-        fontSize: 16,
-        marginBottom: 5,
-        fontWeight: 'bold',
-        color: '#333',
-        marginTop: 10,
+
+    backButton: {
+        padding: theme.spacing.sm,
+        borderRadius: theme.borderRadius.full,
+        backgroundColor: theme.colors.surfaceSecondary,
     },
-    error: {
-        color: 'red',
-        marginBottom: 10,
-        fontSize: 12,
+
+    sectionTitle: {
+        ...theme.typography.h3,
+        color: theme.colors.text.primary,
+        marginBottom: theme.spacing.sm,
+    },
+
+    sectionSubtitle: {
+        ...theme.typography.bodySmall,
+        color: theme.colors.text.secondary,
+        marginBottom: theme.spacing.lg,
+    },
+
+    previewCard: {
+        backgroundColor: theme.colors.surfaceSecondary,
+    },
+
+    previewTitle: {
+        ...theme.typography.body,
+        color: theme.colors.text.primary,
+        fontWeight: '600',
+        marginBottom: theme.spacing.md,
+    },
+
+    previewRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: theme.spacing.sm,
+    },
+
+    previewLabel: {
+        ...theme.typography.body,
+        color: theme.colors.text.secondary,
+    },
+
+    previewValue: {
+        ...theme.typography.body,
+        color: theme.colors.primary,
+        fontWeight: '600',
+    },
+
+    previewExample: {
+        ...theme.typography.caption,
+        color: theme.colors.text.tertiary,
+        marginTop: theme.spacing.sm,
         fontStyle: 'italic',
-        marginLeft: 5,
     },
-})
+});
