@@ -1,9 +1,11 @@
 import Button from "@/components/button";
-import database, { allocationsCollection } from "@/db";
+import database, { accountsCollection, allocationsCollection } from "@/db";
+import Account from "@/model/Account";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { withObservables } from "@nozbe/watermelondb/react";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { InferType, number, object } from "yup";
 
 const formSchema = object({
@@ -16,13 +18,14 @@ const formSchema = object({
 type FormType = InferType<typeof formSchema>;
 
 
-export default function NewAllocationScreen() {
+function NewAllocationScreen({ accounts }: { accounts: Account[] }) {
     const router = useRouter();
-    const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    const { control, handleSubmit, formState: { errors }, reset, watch } = useForm({
         resolver: yupResolver(formSchema),
         mode: "onSubmit",
         defaultValues: formSchema.getDefault(),
     });
+    const income = watch("income");
 
     const onSubmit = async (data: FormType) => {
         console.log("Form submitted with data:", data);
@@ -64,6 +67,12 @@ export default function NewAllocationScreen() {
                     )}
                 />
                 {errors.income && <Text style={styles.error}>{errors.income.message}</Text>}
+                {accounts.map((account) => (
+                    <View key={account.id} style={{ marginBottom: 10, flexDirection: 'row' }}>
+                        <Text >{account.name} : {account.cap}% </Text>
+                        <Text >${(Number(income) * (account.cap ?? 0)) / 100}</Text>
+                    </View>
+                ))}
 
                 <Button onPress={handleSubmit(onSubmit)} label="Save" />
             </ScrollView>
@@ -100,3 +109,9 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
 })
+
+const enhance = withObservables([], () => ({
+    accounts: accountsCollection.query(),
+}));
+
+export default enhance(NewAllocationScreen);

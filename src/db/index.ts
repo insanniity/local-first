@@ -3,9 +3,12 @@ import AccountAllocation from '@/model/AccountAllocation'
 import Allocation from '@/model/Allocation'
 import { Database } from '@nozbe/watermelondb'
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite'
+import { setGenerator } from '@nozbe/watermelondb/utils/common/randomId'
+import * as Crypto from 'expo-crypto'
 import { Platform } from 'react-native'
 import migrations from './migrations'
 import schema from './schema'
+setGenerator(() => Crypto.randomUUID());
 
 // First, create the adapter to the underlying database:
 const adapter = new SQLiteAdapter({

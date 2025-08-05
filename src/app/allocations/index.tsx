@@ -1,9 +1,11 @@
 import Button from "@/components/button";
 import database, { allocationsCollection } from "@/db";
 import Allocation from "@/model/Allocation";
+import { Q } from "@nozbe/watermelondb";
 import { withObservables } from "@nozbe/watermelondb/react";
 import { useRouter } from "expo-router";
 import { TrashIcon } from "lucide-react-native";
+import moment from "moment";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
 function AllocationsScreen({ allocations }: { allocations: Allocation[] }) {
@@ -19,6 +21,7 @@ function AllocationsScreen({ allocations }: { allocations: Allocation[] }) {
                 ListHeaderComponent={() => (
                     <View style={styles.card}>
                         <View style={styles.cardContent}>
+                            <Text>Data</Text>
                             <Text>Income</Text>
                             <Text>Action</Text>
                         </View>
@@ -48,7 +51,13 @@ function AllocationCard({ allocation }: { allocation: Allocation }) {
     return (
         <View style={styles.card}>
             <View style={styles.cardContent}>
-                <Text>{allocation.income}</Text>
+                <Text>{moment(allocation.createdAt).format('DD/MM/YYYY')}</Text>
+                <View
+                    style={styles.cardContent}
+                >
+                    <Text>R$ </Text>
+                    <Text>{allocation.income}</Text>
+                </View>
                 <Pressable style={styles.deleteButton} onPress={handleDelete}>
                     <TrashIcon size={20} color="white" />
                 </Pressable>
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
 });
 
 const enhance = withObservables(['allocations'], () => ({
-    allocations: allocationsCollection.query()
+    allocations: allocationsCollection.query(Q.sortBy('created_at', Q.desc)),
 }))
 
 const EnhancedAllocationsScreen = enhance(AllocationsScreen);
