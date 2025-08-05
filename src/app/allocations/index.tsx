@@ -1,7 +1,8 @@
-import Button from "@/components/button";
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import Header from "@/components/Header";
 import database, { allocationsCollection } from "@/db";
+import AccountAllocation from "@/model/AccountAllocation";
 import Allocation from "@/model/Allocation";
 import { globalStyles } from "@/styles/globalStyles";
 import { theme } from "@/styles/theme";
@@ -47,9 +48,7 @@ function AllocationsScreen({ allocations }: { allocations: Allocation[] }) {
                     <FlatList
                         data={allocations}
                         showsVerticalScrollIndicator={false}
-                        renderItem={({ item }) => (
-                            <AllocationCard allocation={item} />
-                        )}
+                        renderItem={({ item }) => <EnhancedAllocationCard allocation={item} accountAllocations={item.accountAllocations} />}
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={styles.list}
                         ListHeaderComponent={
@@ -68,7 +67,7 @@ function AllocationsScreen({ allocations }: { allocations: Allocation[] }) {
     )
 }
 
-function AllocationCard({ allocation }: { allocation: Allocation }) {
+function AllocationCard({ allocation, accountAllocations }: { allocation: Allocation, accountAllocations: AccountAllocation[] }) {
     async function handleDelete() {
         Alert.alert(
             'Confirmar exclusão',
@@ -212,6 +211,16 @@ const styles = StyleSheet.create({
         maxWidth: 200,
     },
 });
+
+
+const enhanceCard = withObservables(['allocation'], ({ allocation }: { allocation: Allocation }) => ({
+    allocation,
+    accountAllocations: allocation.accountAllocations,
+}));
+
+const EnhancedAllocationCard = enhanceCard(AllocationCard);
+
+
 
 const enhance = withObservables(['allocations'], () => ({
     allocations: allocationsCollection.query(Q.sortBy('created_at', Q.desc)),

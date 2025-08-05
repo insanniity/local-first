@@ -86,83 +86,84 @@ function HomeScreen({ accounts, allocations }: HomeScreenProps) {
         </View>
 
         {/* Status das configurações */}
-        <Card variant="elevated">
-          <Text style={styles.sectionTitle}>Status das Configurações</Text>
-
-          <View style={styles.statusRow}>
-            <View style={styles.statusItem}>
-              <View style={[
-                styles.statusIndicator,
-                { backgroundColor: totalCap === 100 ? theme.colors.status.success : theme.colors.status.warning }
-              ]} />
-              <Text style={styles.statusText}>
-                CAP Total: {totalCap}%
-              </Text>
-            </View>
-
-            {totalCap !== 100 && (
-              <Text style={styles.statusWarning}>
-                {totalCap < 100 ? 'Configure mais contas para atingir 100%' : 'Total excede 100%'}
-              </Text>
-            )}
-          </View>
-        </Card>
-
-        {/* Última alocação */}
-        {lastAllocation && (
+        <View style={{ paddingHorizontal: theme.spacing.md, marginBottom: theme.spacing.sm }}>
           <Card variant="elevated">
-            <Text style={styles.sectionTitle}>Última Alocação</Text>
-            <View style={styles.lastAllocationContent}>
-              <View>
-                <Text style={styles.lastAllocationValue}>
-                  {formatCurrency(lastAllocation.income || 0)}
-                </Text>
-                <Text style={styles.lastAllocationDate}>
-                  {formatDate(lastAllocation.createdAt || new Date())}
+            <Text style={styles.sectionTitle}>Status das Configurações</Text>
+
+            <View style={styles.statusRow}>
+              <View style={styles.statusItem}>
+                <View style={[
+                  styles.statusIndicator,
+                  { backgroundColor: totalCap === 100 ? theme.colors.status.success : theme.colors.status.warning }
+                ]} />
+                <Text style={styles.statusText}>
+                  CAP Total: {totalCap}%
                 </Text>
               </View>
+
+              {totalCap !== 100 && (
+                <Text style={styles.statusWarning}>
+                  {totalCap < 100 ? 'Configure mais contas para atingir 100%' : 'Total excede 100%'}
+                </Text>
+              )}
             </View>
           </Card>
-        )}
+          {/* Última alocação */}
+          {lastAllocation && (
+            <Card variant="elevated">
+              <Text style={styles.sectionTitle}>Última Alocação</Text>
+              <View style={styles.lastAllocationContent}>
+                <View>
+                  <Text style={styles.lastAllocationValue}>
+                    {formatCurrency(lastAllocation.income || 0)}
+                  </Text>
+                  <Text style={styles.lastAllocationDate}>
+                    {formatDate(lastAllocation.createdAt || new Date())}
+                  </Text>
+                </View>
+              </View>
+            </Card>
+          )}
 
-        {/* Ações rápidas */}
-        <Card variant="elevated">
-          <Text style={styles.sectionTitle}>Ações Rápidas</Text>
+          {/* Ações rápidas */}
+          <Card variant="elevated">
+            <Text style={styles.sectionTitle}>Ações Rápidas</Text>
 
-          <View style={styles.quickActions}>
-            <Pressable
-              style={styles.quickAction}
-              onPress={() => router.push('/allocations/new')}
-            >
-              <PlusIcon size={20} color={theme.colors.text.inverse} />
-              <Text style={styles.quickActionText}>Nova Alocação</Text>
-            </Pressable>
+            <View style={styles.quickActions}>
+              <Pressable
+                style={styles.quickAction}
+                onPress={() => router.push('/allocations/new')}
+              >
+                <PlusIcon size={20} color={theme.colors.text.inverse} />
+                <Text style={styles.quickActionText}>Nova Alocação</Text>
+              </Pressable>
 
-            <Pressable
-              style={[styles.quickAction, styles.quickActionSecondary]}
-              onPress={() => router.push('/accounts/new')}
-            >
-              <PlusIcon size={20} color={theme.colors.primary} />
-              <Text style={styles.quickActionTextSecondary}>Nova Conta</Text>
-            </Pressable>
-          </View>
-        </Card>
-
-        {/* Estado vazio */}
-        {accounts.length === 0 && allocations.length === 0 && (
-          <Card variant="outlined" style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>Bem-vindo!</Text>
-            <Text style={styles.emptySubtitle}>
-              Comece configurando suas contas de investimento e fazendo sua primeira alocação.
-            </Text>
-            <Pressable
-              style={styles.emptyAction}
-              onPress={() => router.push('/accounts/new')}
-            >
-              <Text style={styles.emptyActionText}>Configurar Primeira Conta</Text>
-            </Pressable>
+              <Pressable
+                style={[styles.quickAction, styles.quickActionSecondary]}
+                onPress={() => router.push('/accounts/new')}
+              >
+                <PlusIcon size={20} color={theme.colors.primary} />
+                <Text style={styles.quickActionTextSecondary}>Nova Conta</Text>
+              </Pressable>
+            </View>
           </Card>
-        )}
+
+          {/* Estado vazio */}
+          {accounts.length === 0 && allocations.length === 0 && (
+            <Card variant="outlined" style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>Bem-vindo!</Text>
+              <Text style={styles.emptySubtitle}>
+                Comece configurando suas contas de investimento e fazendo sua primeira alocação.
+              </Text>
+              <Pressable
+                style={styles.emptyAction}
+                onPress={() => router.push('/accounts/new')}
+              >
+                <Text style={styles.emptyActionText}>Configurar Primeira Conta</Text>
+              </Pressable>
+            </Card>
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -179,6 +180,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.sm,
     gap: theme.spacing.sm,
+    marginTop: theme.spacing.md,
   },
 
   statCard: {

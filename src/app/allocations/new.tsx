@@ -1,8 +1,8 @@
-import Button from "@/components/button";
+import Button from "@/components/Button";
 import Card from "@/components/Card";
 import Header from "@/components/Header";
 import Input from "@/components/Input";
-import database, { accountsCollection, allocationsCollection } from "@/db";
+import database, { accountAllocationCollection, accountsCollection, allocationsCollection } from "@/db";
 import Account from "@/model/Account";
 import { globalStyles } from "@/styles/globalStyles";
 import { theme } from "@/styles/theme";
@@ -35,9 +35,26 @@ function NewAllocationScreen({ accounts }: { accounts: Account[] }) {
     const onSubmit = async (data: FormType) => {
         try {
             await database.write(async () => {
-                await allocationsCollection.create((allocation) => {
+                const allocation = await allocationsCollection.create((allocation) => {
                     allocation.income = data.income;
                 });
+
+                await Promise.all(accounts.map((account) => accountAllocationCollection.create((item) => {
+                    item.account.set(account);
+                    item.allocation.set(allocation);
+                    item.cap = account.cap;
+                    item.amount = (data.income * (account.cap || 0)) / 100;
+                })));
+
+                const account = accounts[0];
+
+                accountAllocationCollection.create((item) => {
+                    item.account.set(account);
+                    item.allocation.set(allocation);
+                    item.cap = account.cap;
+                    item.amount = (data.income * (account.cap || 0));
+                });
+
             });
             router.replace("/allocations");
             reset(formSchema.getDefault());
