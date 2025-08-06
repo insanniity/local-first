@@ -10,7 +10,7 @@ export async function mySync() {
             console.log('Pulling data');
             const { data, error } = await supabase.rpc('pull', {
                 last_pulled_at: lastPulledAt,
-                schemaversion: schemaVersion,
+                schema_version: schemaVersion,
                 migration: migration,
             });
             console.log(error);
