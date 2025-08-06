@@ -1,5 +1,6 @@
 import { Card, Header } from "@/components";
 import { accountsCollection, allocationsCollection } from "@/db";
+import { mySync } from "@/db/sync";
 import Account from "@/model/Account";
 import Allocation from "@/model/Allocation";
 import { globalStyles } from "@/styles/globalStyles";
@@ -7,7 +8,7 @@ import { theme } from "@/styles/theme";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { withObservables } from "@nozbe/watermelondb/react";
 import { useRouter } from "expo-router";
-import { FolderTreeIcon, PlusIcon, TrendingUpIcon, WalletIcon } from "lucide-react-native";
+import { FolderTreeIcon, PlusIcon, RefreshCcwIcon, TrendingUpIcon, WalletIcon } from "lucide-react-native";
 import moment from "moment";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -33,6 +34,16 @@ function HomeScreen({ accounts, allocations }: HomeScreenProps) {
       <Header
         title="Dashboard"
         subtitle="Visão geral dos seus investimentos"
+        rightAction={
+          <Pressable
+            style={styles.refreshButton}
+            onPress={() => {
+              mySync();
+            }}
+          >
+            <RefreshCcwIcon size={20} color={theme.colors.text.inverse} />
+          </Pressable>
+        }
       />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -325,6 +336,14 @@ const styles = StyleSheet.create({
   emptyActionText: {
     ...theme.typography.button,
     color: theme.colors.text.inverse,
+  },
+  refreshButton: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadows.sm,
   },
 });
 

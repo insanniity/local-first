@@ -28,8 +28,8 @@ export default function LoginScreen() {
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(formSchmema),
         defaultValues: {
-            email: '',
-            password: '',
+            email: __DEV__ ? 'contato@insannity.dev' : '',
+            password: __DEV__ ? '123456' : '',
         }
     });
 
